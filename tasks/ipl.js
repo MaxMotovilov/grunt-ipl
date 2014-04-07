@@ -4,7 +4,8 @@
 // available at https://raw.githubusercontent.com/MaxMotovilov/ipl.js/master/LICENSE
 
 var ipl = require( 'ipl' ),
-	promise = require( 'node-promise' );
+	promise = require( 'node-promise' ),
+	fs = require( 'fs' );
 
 'use strict';
 
@@ -26,13 +27,40 @@ module.exports = function(grunt) {
 			var runner = ipl( options ),
 				done = this.async();
 
-			promise.all( this.files.map( runOne, this ) )
+			promise.all( this.files.map( protectBy( runOne, logError ), this ) )
 				   .then( function( results ) {
 				   		done( results.all( function(r) { return !(r instanceof Error); } ) );
 				   } );
 
+			function protectBy( a, b ) {
+				return function(x) {
+					return promise.when( x, a.bind(this) ).then( null, b.bind(this) ); 
+				}
+			}
+
 			function runOne( f ) {
-				
+				if( f.src.length != 1 )
+					throw Error( "grint-ipl requires one source per target" );
+
+				var type = /[.](?:js|html)$/.exec( f.src[0] );
+
+				var input = f.src[0],
+					result = promise.defer();
+
+			}
+
+			function logError( err ) {
+				grunt.log.error( 
+					(err.tagname && (
+						err.tagname +
+						(err.filename && (
+							" (" + err.filename +
+							(err.line ? ' [' + err.line + ']' : "") +
+							")"
+						) || "") + ": "
+					) || "") +
+					err.stack
+				);
 			}
 
 	this.files.forEach(function( f ) {
