@@ -1,48 +1,34 @@
+// Copyright (C) 2014, 12 Quarters Consulting
+// All rights reserved.
+// Redistribution and use are permitted under the modified BSD license
+// available at https://raw.githubusercontent.com/MaxMotovilov/ipl.js/master/LICENSE
+
 'use strict';
 
-var grunt = require('grunt');
+var grunt = require('grunt'),
+	path = require( 'path' ),
 
-/*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
-
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
-*/
+	cwd = path.join( __dirname, "../node_modules/test" );
 
 exports.ipl = {
-  setUp: function(done) {
-    // setup here if necessary
-    done();
-  },
-  default_options: function(test) {
-    test.expect(1);
+	test: function( test ) {
+		var inputs = grunt.file.expand( path.join( cwd, "in/*" ) );
+		test.expect( 3 * inputs.length );
 
-    var actual = grunt.file.read('tmp/default_options');
-    var expected = grunt.file.read('test/expected/default_options');
-    test.equal(actual, expected, 'should describe what the default behavior is.');
+		inputs.forEach( function( input ) {
+			var gauge = path.join( path.dirname( input ), "../out", path.basename( input ) ),
+				output = path.join( __dirname, "../tmp", path.basename( input ) );
 
-    test.done();
-  },
-  custom_options: function(test) {
-    test.expect(1);
+			test.ok( grunt.file.exists( gauge ), "BUG -- " + gauge + " should be present" );
+			test.ok( grunt.file.exists( output ), output + "should be present" );
+			test.equal(
+				grunt.file.read( output ),
+				grunt.file.read( gauge ),
+				gauge + " and " + output + " should be identical"
+			);
+		} );
 
-    var actual = grunt.file.read('tmp/custom_options');
-    var expected = grunt.file.read('test/expected/custom_options');
-    test.equal(actual, expected, 'should describe what the custom option(s) behavior is.');
+		test.done();
+	}
+}	
 
-    test.done();
-  },
-};

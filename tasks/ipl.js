@@ -10,7 +10,6 @@ var ipl = require( 'ipl' ),
 'use strict';
 
 module.exports = function(grunt) {
-
   	grunt.registerMultiTask( 'ipl', 'Grunt binding for ipl.js', 
   		function() {
 			var options = this.options( {
@@ -21,7 +20,7 @@ module.exports = function(grunt) {
 
 			if( !options.include )
 				delete options.include;
-			else if( !(options include instanceof Array) )
+			else if( !(options.include instanceof Array) )
 				options.include = options.include.split( /\s*[,;]\s*/ );
 
 			var runner = ipl( options ),
@@ -29,24 +28,35 @@ module.exports = function(grunt) {
 
 			promise.all( this.files.map( protectBy( runOne, logError ), this ) )
 				   .then( function( results ) {
-				   		done( results.all( function(r) { return !(r instanceof Error); } ) );
+				   		done( results.every( function(r) { return !(r instanceof Error); } ) );
 				   } );
 
 			function protectBy( a, b ) {
 				return function(x) {
-					return promise.when( x, a.bind(this) ).then( null, b.bind(this) ); 
+					return promise.whenPromise( x, a.bind(this) ).then( null, b.bind(this) ); 
 				}
 			}
 
 			function runOne( f ) {
 				if( f.src.length != 1 )
-					throw Error( "grint-ipl requires one source per target" );
+					throw Error( "grunt-ipl: only one source per target" );
 
 				var type = /[.](?:js|html)$/.exec( f.src[0] );
+				if( !type )
+					throw Error( "grunt-ipl: cannot determine content type from " + f.src[0] );
 
-				var input = f.src[0],
-					result = promise.defer();
+				var	result = promise.defer(),
+					output = runner( fs.createReadStream( f.src[0] ), {}, type[0] == ".js", this.args );
 
+				output.on( 'error', result.reject.bind( result ) )
+					  .once( 'readable', function() { 
+						output.pipe(
+							fs.createWriteStream( f.dest )
+						  	  .on( 'error', result.reject.bind( result ) )
+						);
+					  } );
+
+				return result;
 			}
 
 			function logError( err ) {
@@ -62,31 +72,6 @@ module.exports = function(grunt) {
 					err.stack
 				);
 			}
-
-	this.files.forEach(function( f ) {
-	  // Concat specified files.
-	  var src = f.src.filter(function(filepath) {
-		// Warn on and remove invalid source files (if nonull was set).
-		if (!grunt.file.exists(filepath)) {
-		  grunt.log.warn('Source file "' + filepath + '" not found.');
-		  return false;
-		} else {
-		  return true;
 		}
-	  }).map(function(filepath) {
-		// Read file source.
-		return grunt.file.read(filepath);
-	  }).join(grunt.util.normalizelf(options.separator));
-
-	  // Handle options.
-	  src += options.punctuation;
-
-	  // Write the destination file.
-	  grunt.file.write(f.dest, src);
-
-	  // Print a success message.
-	  grunt.log.writeln('File "' + f.dest + '" created.');
-	});
-  });
-
-};
+	);
+}

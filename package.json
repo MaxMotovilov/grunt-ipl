@@ -1,0 +1,39 @@
+{
+  "name": "grunt-ipl",
+  "version": "0.1.1",
+  "description": "Grunt binding for ipl.js",
+  "author": {
+    "name": "Max Motovilov",
+    "email": "max@motovilov.com"
+  },
+
+  "license" : "BSD-3-Clause",
+
+  "files": [
+	"LICENSE",
+    "package.json",
+    "Gruntfile.js",
+    "tasks",
+	"test"
+  ],
+
+  "dependencies": {
+	"node-promise": ">= 0.5.10"
+  },
+
+  "devDependencies": {
+	"grunt": "*",
+	"grunt-contrib-nodeunit": "*",
+	"grunt-contrib-clean": "*"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/MaxMotovilov/grunt-ipl.git"
+  },
+
+  "engines": {
+    "node": ">= 0.10"
+  }
+}
+
