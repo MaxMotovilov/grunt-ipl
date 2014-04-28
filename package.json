@@ -18,7 +18,8 @@
   ],
 
   "dependencies": {
-	"node-promise": ">= 0.5.10"
+	"node-promise": ">= 0.5.10",
+	"ipl": ">= 0.1.1"
   },
 
   "devDependencies": {
