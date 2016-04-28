@@ -1,4 +1,4 @@
-// Copyright (C) 2014, 12 Quarters Consulting
+// Copyright (C) 2014-2016, 12 Quarters Consulting
 // All rights reserved.
 // Redistribution and use are permitted under the modified BSD license
 // available at https://raw.githubusercontent.com/MaxMotovilov/ipl.js/master/LICENSE
@@ -8,10 +8,11 @@
 var grunt = require('grunt'),
 	path = require( 'path' ),
 
-	cwd = path.join( __dirname, "../node_modules/test" );
+	cwd = path.join( __dirname, "../node_modules/ipl/test" );
 
 exports.ipl = {
 	test: function( test ) {
+
 		var inputs = grunt.file.expand( path.join( cwd, "in/*" ) );
 		test.expect( 3 * inputs.length );
 
