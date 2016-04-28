@@ -19,7 +19,8 @@ module.exports = function(grunt) {
     ipl: {
 		test: {
 			options: { 
-				include: "node_modules/ipl/test/include" 
+				include: "node_modules/ipl/test/include",
+				env: require( "ipl/test/env" )
 			},
 			files: [ {
 				expand: true,
